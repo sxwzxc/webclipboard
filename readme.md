@@ -1,5 +1,69 @@
 ## 在线剪切板
 
+## 开发和部署指南
+
+### 如果修改了项目代码，如何运行和部署？
+
+本项目有三种部署方式，根据你修改的内容选择相应的方式：
+
+#### 1. 修改了 allnode_version 目录的代码（Node.js 版本）
+
+**本地开发运行：**
+```bash
+# 进入项目目录
+cd webclipboard/allnode_version
+
+# 安装依赖（首次运行或 package.json 有变化时）
+npm install
+
+# 启动开发服务器
+node api.js
+
+# 访问 http://localhost:3000 进行测试
+```
+
+**部署到生产环境：**
+- **使用源码部署**：参考下方"源码部署"章节，重新执行部署步骤
+- **使用 Docker 部署**：需要重新构建镜像
+  ```bash
+  cd allnode_version
+  docker build -t webclipboard-custom .
+  docker run -dp 8080:3000 webclipboard-custom
+  ```
+
+#### 2. 修改了 cf_version 目录的代码（Cloudflare Workers 版本）
+
+**本地开发运行：**
+```bash
+# 进入 cf_version 目录
+cd webclipboard/cf_version
+
+# 安装依赖（首次运行或 package.json 有变化时）
+npm install
+
+# 本地开发模式（可选）
+npx wrangler dev
+
+# 部署到 Cloudflare
+npx wrangler login  # 首次需要登录
+npx wrangler deploy
+```
+
+**注意**：如果修改了前端文件（如 `allnode_version/public/` 下的 HTML 文件），需要重新上传到 R2：
+```bash
+cd cf_version
+npx wrangler r2 object put webclipboard-storage/public/index.html --file=../allnode_version/public/index.html
+npx wrangler r2 object put webclipboard-storage/public/t2.html --file=../allnode_version/public/t2.html
+```
+
+#### 3. 修改了根目录的独立工具（daily-note.js, pic-viewer.js）
+
+这些是独立的 HTML/JavaScript 文件，可以：
+- 直接在浏览器中打开 HTML 文件进行测试
+- 部署到任何静态文件服务器（如 GitHub Pages、Vercel、Netlify 等）
+
+---
+
 <details>
 <summary>源码部署(点击展开)</summary>
 
